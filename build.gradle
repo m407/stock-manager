@@ -6,17 +6,21 @@ plugins {
 
 group = 'ru.m407.stock'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_15
+targetCompatibility = JavaVersion.VERSION_15
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	implementation 'org.flywaydb:flyway-core'
-	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.postgresql:postgresql'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
