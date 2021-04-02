@@ -43,15 +43,13 @@ FROM "RTSI"
         "RTSI"."ticker" = "RTSI_HIST_MNTH"."ticker" AND
         "RTSI"."per" = "RTSI_HIST_MNTH"."per" AND
         date_part('month', "RTSI"."date") = "RTSI_HIST_MNTH"."date_part"
-         LEFT OUTER JOIN "prices_imported" AS "USDRUB" ON
+         INNER JOIN "prices_imported" AS "USDRUB" ON
         "USDRUB"."date" = "RTSI"."date" AND "USDRUB"."time" = "RTSI"."time" AND "USDRUB"."per" = "RTSI"."per" AND
         "USDRUB"."ticker" = 'USDRUB'
-         LEFT OUTER JOIN "prices_imported" AS "BRN" ON
+         INNER JOIN "prices_imported" AS "BRN" ON
         "BRN"."date" = "RTSI"."date" AND "BRN"."time" = "RTSI"."time" AND "BRN"."per" = "RTSI"."per" AND
         "BRN"."ticker" = 'ICE.BRN'
-         LEFT OUTER JOIN "prices_imported" AS "SP500" ON
+         INNER JOIN "prices_imported" AS "SP500" ON
         "SP500"."date" = "RTSI"."date" AND "SP500"."time" = "RTSI"."time" AND "SP500"."per" = "RTSI"."per" AND
         "SP500"."ticker" = 'SANDP-500'
 ORDER BY "RTSI"."date", "RTSI"."time";
-
-
