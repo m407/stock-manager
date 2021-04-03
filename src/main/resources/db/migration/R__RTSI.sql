@@ -10,34 +10,49 @@ WITH "RTSI" AS (SELECT *,
                         ORDER BY "date"
                         ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "SMA200",
                             COUNT(*) FILTER ( WHERE "close" - "open" > 0 ) OVER
-                        ( PARTITION BY "ticker", "per", date_part('dow', "date")
+                        ( PARTITION BY "ticker", "per", date_part('' DOW '', "date")
                         ORDER BY "date"
                         ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "DOW_CLOSE_POSITIVE_COUNT",
                             COUNT(*) FILTER ( WHERE "close" - "open" < 0 ) OVER
-                        ( PARTITION BY "ticker", "per", date_part('dow', "date")
+                        ( PARTITION BY "ticker", "per", date_part('' DOW '', "date")
                         ORDER BY "date"
                         ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "DOW_CLOSE_NEGATIVE_COUNT",
                             AVG("high" - "low") OVER
-                        ( PARTITION BY "ticker", "per", date_part('dow', "date") ) AS "DOW_AVG_SPREAD",
+                        ( PARTITION BY "ticker", "per", date_part('' DOW '', "date") ) AS "DOW_AVG_SPREAD",
                             AVG("high" - "low") OVER
-                        ( PARTITION BY "ticker", "per", date_part('day', "date") ) AS "DAY_AVG_SPREAD",
+                        ( PARTITION BY "ticker", "per", date_part('' DAY '', "date") ) AS "DAY_AVG_SPREAD",
                             AVG("high" - "low") OVER
-                        ( PARTITION BY "ticker", "per", date_part('month', "date") ) AS "MNTH_AVG_SPREAD",
+                        ( PARTITION BY "ticker", "per", date_part('' MONTH '', "date") ) AS "MNTH_AVG_SPREAD",
                             first_value("open") OVER (
-                        PARTITION BY "ticker", "per", date_part('year', "date"), date_part('month', "date")
+                        PARTITION BY "ticker", "per", date_part('' YEAR '', "date"), date_part('' MONTH '', "date")
                         ORDER BY "date" DESC
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_CLOSE",
                             first_value("open") OVER (
-                        PARTITION BY "ticker", "per", date_part('year', "date"), date_part('month', "date")
+                        PARTITION BY "ticker", "per", date_part('' YEAR '', "date"), date_part('' MONTH '', "date")
                         ORDER BY "date"
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_OPEN"
                 FROM "prices_imported"
-                WHERE "ticker" = 'RI.RTSI')
-SELECT *,
+                WHERE "ticker" = ''RI.RTSI'')
+SELECT "RTSI"."ticker",
+    "RTSI"."per",
+    "RTSI"."date",
+    "RTSI"."time",
+    "RTSI"."open",
+    "RTSI"."high",
+    "RTSI"."low",
+    "RTSI"."close",
+    "RTSI"."vol",
+    "RTSI"."SMA50",
+    "RTSI"."SMA200",
+    "RTSI"."DOW_CLOSE_POSITIVE_COUNT",
+    "RTSI"."DOW_CLOSE_NEGATIVE_COUNT",
+    "RTSI"."DOW_AVG_SPREAD",
+    "RTSI"."DAY_AVG_SPREAD",
+    "RTSI"."MNTH_AVG_SPREAD",
             COUNT("RTSI".*) FILTER ( WHERE "RTSI"."MNTH_CLOSE" - "RTSI"."MNTH_OPEN" > 0) OVER
-        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('month', "RTSI"."date")) AS "MNTH_CLOSE_POSITIVE_COUNT",
+        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('' MONTH '', "RTSI"."date")) AS "MNTH_CLOSE_POSITIVE_COUNT",
             COUNT("RTSI".*) FILTER ( WHERE "RTSI"."MNTH_CLOSE" - "RTSI"."MNTH_OPEN" < 0) OVER
-        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('month', "RTSI"."date")) AS "MNTH_CLOSE_NEGATIVE_COUNT",
+        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('' MONTH '', "RTSI"."date")) AS "MNTH_CLOSE_NEGATIVE_COUNT",
     "USDRUB"."close" - "USDRUB"."open" AS "usdrub_close_open",
     "USDRUB"."vol" AS "usdrub_vol",
     "BRN"."close" - "BRN"."open" AS "brn_close_open",
@@ -47,11 +62,11 @@ SELECT *,
 FROM "RTSI"
          INNER JOIN "prices_imported" AS "USDRUB" ON
         "USDRUB"."date" = "RTSI"."date" AND "USDRUB"."time" = "RTSI"."time" AND "USDRUB"."per" = "RTSI"."per" AND
-        "USDRUB"."ticker" = 'USDRUB'
+        "USDRUB"."ticker" = ''USDRUB''
          INNER JOIN "prices_imported" AS "BRN" ON
         "BRN"."date" = "RTSI"."date" AND "BRN"."time" = "RTSI"."time" AND "BRN"."per" = "RTSI"."per" AND
-        "BRN"."ticker" = 'ICE.BRN'
+        "BRN"."ticker" = ''ICE.BRN''
          INNER JOIN "prices_imported" AS "SP500" ON
         "SP500"."date" = "RTSI"."date" AND "SP500"."time" = "RTSI"."time" AND "SP500"."per" = "RTSI"."per" AND
-        "SP500"."ticker" = 'SANDP-500'
+        "SP500"."ticker" = ''SANDP-500''
 ORDER BY "RTSI"."date", "RTSI"."time";
