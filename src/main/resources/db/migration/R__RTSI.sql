@@ -8,26 +8,36 @@ WITH "RTSI" AS (SELECT *,
                             AVG("close") OVER
                         (PARTITION BY "ticker", "per"
                         ORDER BY "date"
-                        ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "SMA200"
+                        ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "SMA200",
+                            COUNT(*) FILTER ( WHERE "close" - "open" > 0 ) OVER
+                        ( PARTITION BY "ticker", "per", date_part('dow', "date")
+                        ORDER BY "date"
+                        ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "DOW_CLOSE_POSITIVE_COUNT",
+                            COUNT(*) FILTER ( WHERE "close" - "open" < 0 ) OVER
+                        ( PARTITION BY "ticker", "per", date_part('dow', "date")
+                        ORDER BY "date"
+                        ROWS BETWEEN 200 PRECEDING AND CURRENT ROW) AS "DOW_CLOSE_NEGATIVE_COUNT",
+                            AVG("high" - "low") OVER
+                        ( PARTITION BY "ticker", "per", date_part('dow', "date") ) AS "DOW_AVG_SPREAD",
+                            AVG("high" - "low") OVER
+                        ( PARTITION BY "ticker", "per", date_part('day', "date") ) AS "DAY_AVG_SPREAD",
+                            AVG("high" - "low") OVER
+                        ( PARTITION BY "ticker", "per", date_part('month', "date") ) AS "MNTH_AVG_SPREAD",
+                            first_value("open") OVER (
+                        PARTITION BY "ticker", "per", date_part('year', "date"), date_part('month', "date")
+                        ORDER BY "date" DESC
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_CLOSE",
+                            first_value("open") OVER (
+                        PARTITION BY "ticker", "per", date_part('year', "date"), date_part('month', "date")
+                        ORDER BY "date"
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_OPEN"
                 FROM "prices_imported"
-                WHERE "ticker" = 'RI.RTSI'),
-    "RTSI_HIST_DAY" AS (
-        SELECT "ticker", "per", date_part('day', "date") AS "date_part",
-            AVG("high" - "low") AS "DAY_AVG_SPREAD"
-        FROM "prices_imported"
-        WHERE "ticker" = 'RI.RTSI'
-        GROUP BY "ticker", "per", date_part('day', "date")
-    ),
-    "RTSI_HIST_MNTH" AS (
-        SELECT "ticker", "per", date_part('month', "date") AS "date_part",
-            AVG("high" - "low") AS "MNTH_AVG_SPREAD"
-        FROM "prices_imported"
-        WHERE "ticker" = 'RI.RTSI'
-        GROUP BY "ticker", "per", date_part('month', "date")
-    )
-SELECT "RTSI".*,
-    "RTSI_HIST_DAY"."DAY_AVG_SPREAD",
-    "RTSI_HIST_MNTH"."MNTH_AVG_SPREAD",
+                WHERE "ticker" = 'RI.RTSI')
+SELECT *,
+            COUNT("RTSI".*) FILTER ( WHERE "RTSI"."MNTH_CLOSE" - "RTSI"."MNTH_OPEN" > 0) OVER
+        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('month', "RTSI"."date")) AS "MNTH_CLOSE_POSITIVE_COUNT",
+            COUNT("RTSI".*) FILTER ( WHERE "RTSI"."MNTH_CLOSE" - "RTSI"."MNTH_OPEN" < 0) OVER
+        (PARTITION BY "RTSI"."ticker", "RTSI"."per", date_part('month', "RTSI"."date")) AS "MNTH_CLOSE_NEGATIVE_COUNT",
     "USDRUB"."close" - "USDRUB"."open" AS "usdrub_close_open",
     "USDRUB"."vol" AS "usdrub_vol",
     "BRN"."close" - "BRN"."open" AS "brn_close_open",
@@ -35,14 +45,6 @@ SELECT "RTSI".*,
     "SP500"."close" - "SP500"."open" AS "sp500_close_open",
     "SP500"."vol" AS "sp500__vol"
 FROM "RTSI"
-         INNER JOIN "RTSI_HIST_DAY" ON
-        "RTSI"."ticker" = "RTSI_HIST_DAY"."ticker" AND
-        "RTSI"."per" = "RTSI_HIST_DAY"."per" AND
-        date_part('day', "RTSI"."date") = "RTSI_HIST_DAY"."date_part"
-         INNER JOIN "RTSI_HIST_MNTH" ON
-        "RTSI"."ticker" = "RTSI_HIST_MNTH"."ticker" AND
-        "RTSI"."per" = "RTSI_HIST_MNTH"."per" AND
-        date_part('month', "RTSI"."date") = "RTSI_HIST_MNTH"."date_part"
          INNER JOIN "prices_imported" AS "USDRUB" ON
         "USDRUB"."date" = "RTSI"."date" AND "USDRUB"."time" = "RTSI"."time" AND "USDRUB"."per" = "RTSI"."per" AND
         "USDRUB"."ticker" = 'USDRUB'
