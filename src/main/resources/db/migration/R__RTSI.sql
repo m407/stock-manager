@@ -1,6 +1,10 @@
 DROP VIEW IF EXISTS "RTSI";
 CREATE VIEW "RTSI" AS
 WITH "RTSI" AS (SELECT *,
+                            first_value("open") OVER (
+                        PARTITION BY "ticker", "per"
+                        ORDER BY "date"
+                        ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING EXCLUDE CURRENT ROW) AS "NEXT_DAY_OPEN",
                             AVG("close") OVER
                         (PARTITION BY "ticker", "per"
                         ORDER BY "date"
@@ -42,6 +46,7 @@ SELECT "RTSI"."ticker",
     "RTSI"."low",
     "RTSI"."close",
     "RTSI"."vol",
+    "RTSI"."NEXT_DAY_OPEN",
     "RTSI"."SMA50",
     "RTSI"."SMA200",
     "RTSI"."DOW_CLOSE_POSITIVE_COUNT",
