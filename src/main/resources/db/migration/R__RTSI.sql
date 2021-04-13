@@ -36,7 +36,7 @@ WITH "RTSI" AS (SELECT *,
                         ORDER BY "date"
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_OPEN"
                 FROM "prices_imported"
-                WHERE "ticker" = 'RI.RTSI')
+                WHERE "ticker" = 'RI.RTSI' AND "per" = 'D')
 SELECT "RTSI"."ticker",
     "RTSI"."per",
     "RTSI"."date",
