@@ -1,5 +1,6 @@
 DROP VIEW IF EXISTS "RTSI";
-CREATE VIEW "RTSI" AS
+DROP VIEW IF EXISTS "RI.RTSI";
+CREATE VIEW "RI.RTSI" AS
 WITH "RTSI" AS (SELECT *,
                             first_value("open") OVER (
                         PARTITION BY "ticker", "per"
