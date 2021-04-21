@@ -1,5 +1,7 @@
 DROP VIEW IF EXISTS "RTSI";
 DROP VIEW IF EXISTS "RI.RTSI";
+DROP VIEW IF EXISTS "RI.RTSI.10";
+
 CREATE VIEW "RI.RTSI" AS
 WITH "RTSI" AS (SELECT *,
                             first_value("open") OVER (
@@ -76,3 +78,9 @@ FROM "RTSI"
         "SP500"."date" = "RTSI"."date" AND "SP500"."time" = "RTSI"."time" AND "SP500"."per" = "RTSI"."per" AND
         "SP500"."ticker" = 'SANDP-500'
 ORDER BY "RTSI"."date", "RTSI"."time";
+
+CREATE VIEW "RI.RTSI.10" AS
+SELECT *
+FROM "prices_imported"
+WHERE "ticker" = 'RI.RTSI' AND "per" = '10' AND
+    EXISTS(SELECT 1 FROM "RI.RTSI" WHERE "RI.RTSI"."date" = "prices_imported"."date" AND "RI.RTSI"."per" = 'D');
