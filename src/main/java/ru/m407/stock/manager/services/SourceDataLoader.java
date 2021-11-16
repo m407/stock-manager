@@ -27,8 +27,8 @@ public class SourceDataLoader {
     if (dataSource != null) {
       try {
         Statement st =  dataSource.getConnection().createStatement();
-        st.execute("TRUNCATE TABLE "prices_imported";");
-        st.execute("DELETE FROM "TABLE" "prices_history" WHERE "close" = 0 AND "low" = 0 AND "open" = 0 AND "high" = 0;");
+        st.execute("TRUNCATE TABLE prices_imported;");
+        st.execute("DELETE FROM prices_history WHERE close = 0 AND low = 0 AND open = 0 AND high = 0;");
       } catch (Exception e) {
         log.error("TRUNCATE failed", e);
       }
@@ -55,13 +55,13 @@ public class SourceDataLoader {
 
       try {
         Statement st = dataSource.getConnection().createStatement();
-        st.execute("INSERT INTO "prices_history"\n" +
-                "SELECT "pi".*\n" +
-                "FROM "prices_imported" "pi"\n" +
-                "         LEFT JOIN "prices_history" "ph"\n" +
-                "ON "pi"."ticker" = "ph"."ticker" AND "ph"."per" = "pi"."per" AND "ph"."date" = "pi"."date" AND\n" +
-                "   "ph"."time" = "pi"."time"\n" +
-                "WHERE "ph"."ticker" IS NULL;\n");
+        st.execute("INSERT INTO prices_history\n" +
+                "SELECT pi.*\n" +
+                "FROM prices_imported pi\n" +
+                "         LEFT JOIN prices_history ph\n" +
+                "ON pi.ticker = ph.ticker AND ph.per = pi.per AND ph.date = pi.date AND\n" +
+                "   ph.time = pi.time\n" +
+                "WHERE ph.ticker IS NULL;\n");
       } catch (Exception e) {
         log.error("Data move to history failed");
       }
