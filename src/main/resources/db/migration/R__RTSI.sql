@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS "RTSI";
-DROP VIEW IF EXISTS "RI.RTSI";
 DROP VIEW IF EXISTS "RI.RTSI.10";
+DROP VIEW IF EXISTS "RI.RTSI";
 
 CREATE VIEW "RI.RTSI" AS
 WITH "RTSI" AS (SELECT *,
@@ -38,7 +37,7 @@ WITH "RTSI" AS (SELECT *,
                         PARTITION BY "ticker", "per", date_part('year', "date"), date_part('month', "date")
                         ORDER BY "date"
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW) AS "MNTH_OPEN"
-                FROM "prices_imported"
+                FROM "prices_history"
                 WHERE "ticker" = 'RI.RTSI' AND "per" = 'D')
 SELECT "RTSI"."ticker",
     "RTSI"."per",
@@ -68,19 +67,20 @@ SELECT "RTSI"."ticker",
     "SP500"."close" - "SP500"."open" AS "sp500_close_open",
     "SP500"."vol" AS "sp500__vol"
 FROM "RTSI"
-         INNER JOIN "prices_imported" AS "USDRUB" ON
-        "USDRUB"."date" = "RTSI"."date" AND "USDRUB"."time" = "RTSI"."time" AND "USDRUB"."per" = "RTSI"."per" AND
-        "USDRUB"."ticker" = 'USDRUB'
-         INNER JOIN "prices_imported" AS "BRN" ON
-        "BRN"."date" = "RTSI"."date" AND "BRN"."time" = "RTSI"."time" AND "BRN"."per" = "RTSI"."per" AND
-        "BRN"."ticker" = 'ICE.BRN'
-         INNER JOIN "prices_imported" AS "SP500" ON
-        "SP500"."date" = "RTSI"."date" AND "SP500"."time" = "RTSI"."time" AND "SP500"."per" = "RTSI"."per" AND
-        "SP500"."ticker" = 'SANDP-500'
+         INNER JOIN "prices_history" AS "USDRUB" ON
+            "USDRUB"."date" = "RTSI"."date" AND "USDRUB"."time" = "RTSI"."time" AND "USDRUB"."per" = "RTSI"."per" AND
+            "USDRUB"."ticker" = 'USDRUB'
+         INNER JOIN "prices_history" AS "BRN" ON
+            "BRN"."date" = "RTSI"."date" AND "BRN"."time" = "RTSI"."time" AND "BRN"."per" = "RTSI"."per" AND
+            "BRN"."ticker" = 'ICE.BRN'
+         INNER JOIN "prices_history" AS "SP500" ON
+            "SP500"."date" = "RTSI"."date" AND "SP500"."time" = "RTSI"."time" AND "SP500"."per" = "RTSI"."per" AND
+            "SP500"."ticker" = 'SANDP-500'
 ORDER BY "RTSI"."date", "RTSI"."time";
 
 CREATE VIEW "RI.RTSI.10" AS
 SELECT *
-FROM "prices_imported"
+FROM "prices_history"
 WHERE "ticker" = 'RI.RTSI' AND "per" = '10' AND
-    EXISTS(SELECT 1 FROM "RI.RTSI" WHERE "RI.RTSI"."date" = "prices_imported"."date" AND "RI.RTSI"."per" = 'D');
+    EXISTS(SELECT 1 FROM "RI.RTSI" WHERE "RI.RTSI"."date" = "prices_history"."date" AND "RI.RTSI"."per" = 'D')
+ORDER BY "date", "time";

@@ -1,14 +1,28 @@
 create table prices_imported
 (
-    ticker text not null,
-    per text not null,
-    date date not null,
-    time time not null,
-    open double precision not null,
-    high double precision not null,
-    low double precision not null,
-    close double precision not null,
-    vol bigint not null,
-    constraint prices_imported_ticker_per_date_time_pk
-        primary key (ticker, per, date, time)
+    ticker  text             not null,
+    per     text             not null,
+    "date"  DATE             NOT NULL,
+    "time"  TIME             NOT NULL,
+    "open"  DOUBLE PRECISION NOT NULL,
+    "high"  DOUBLE PRECISION NOT NULL,
+    "low"   DOUBLE PRECISION NOT NULL,
+    "close" DOUBLE PRECISION NOT NULL,
+    "vol"   BIGINT           NOT NULL,
+    CONSTRAINT "prices_imported_ticker_per_date_time_pk"
+        PRIMARY KEY ("ticker", "per", "date", "time")
+);
+
+CREATE TABLE "prices_history" (
+    "ticker" TEXT             NOT NULL,
+    "per"    TEXT             NOT NULL,
+    "date"   DATE             NOT NULL,
+    "time"   TIME             NOT NULL,
+    "open"   DOUBLE PRECISION NOT NULL,
+    "high"   DOUBLE PRECISION NOT NULL,
+    "low"    DOUBLE PRECISION NOT NULL,
+    "close"  DOUBLE PRECISION NOT NULL,
+    "vol"    BIGINT           NOT NULL,
+    CONSTRAINT "prices_history_ticker_per_date_time_pk"
+        PRIMARY KEY ("ticker", "per", "date", "time")
 );
