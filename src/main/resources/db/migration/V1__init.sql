@@ -8,9 +8,7 @@ create table prices_imported
     "high"  DOUBLE PRECISION NOT NULL,
     "low"   DOUBLE PRECISION NOT NULL,
     "close" DOUBLE PRECISION NOT NULL,
-    "vol"   BIGINT           NOT NULL,
-    CONSTRAINT "prices_imported_ticker_per_date_time_pk"
-        PRIMARY KEY ("ticker", "per", "date", "time")
+    "vol"   BIGINT           NOT NULL
 );
 
 CREATE TABLE "prices_history" (
