@@ -52,13 +52,8 @@ public class RemoteDataLoader {
   }
 
   private URL createTikerUrl(TikerMeta tikerMeta) {
-    LocalDate dateFrom = LocalDate.of(latestStoredYear, 1, 1);
-    LocalDate dateTo;
-    if (latestStoredYear == LocalDate.now().getYear()) {
-      dateTo = LocalDate.now();
-    } else {
-      dateTo = LocalDate.of(latestStoredYear, 12, 31);
-    }
+    LocalDate dateFrom = LocalDate.of(latestStoredYear, 0, 1);
+    LocalDate dateTo = LocalDate.now();
     String url = String.format("%s?%s&%s&cn=%s&df=%d&mf=%d&yf=%d&dt=%d&mt=%d&yt=%d",
             finamBaseUrl,
             finamDefaultParams,
