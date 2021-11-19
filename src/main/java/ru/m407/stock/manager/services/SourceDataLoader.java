@@ -46,7 +46,7 @@ public class SourceDataLoader {
               "         LEFT JOIN prices_history ph\n" +
               "ON pi.ticker = ph.ticker AND ph.per = pi.per AND ph.date = pi.date AND\n" +
               "   ph.time = pi.time\n" +
-              "WHERE ph.ticker IS NULL;\n");
+              "WHERE ph.ticker IS NULL;");
     } catch (Exception e) {
       log.error("Data move to history failed");
     }
