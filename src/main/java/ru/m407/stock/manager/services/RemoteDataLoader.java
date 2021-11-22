@@ -25,42 +25,42 @@ public class RemoteDataLoader {
     }
   }
 
-  private int latestStoredYear;
+  private LocalDate latestStoredDate;
   private ArrayList<TikerMeta> tikers;
   private final String finamBaseUrl = "https://export.finam.ru/export9.out";
   private final String finamDefaultParams = "apply=0&p=8&dtf=1&tmf=3&MSOR=1&mstime=on&mstimever=1&sep=1&sep2=1&datf=1&at=1";
 
   public RemoteDataLoader(HistoryInfo historyInfo) {
-    this.latestStoredYear = historyInfo.latestStoredYear();
+    this.latestStoredDate = historyInfo.latestStoredDate();
     tikers = new ArrayList();
     tikers.add(new TikerMeta(
-            "RI.RTSI",
-            "market=91&em=420445"
+            "market=91&em=420445",
+            "RI.RTSI"
     ));
     tikers.add(new TikerMeta(
-            "USDRUB",
-            "market=5&em=901"
+            "market=5&em=901",
+            "USDRUB"
     ));
     tikers.add(new TikerMeta(
-            "ICE.BRN",
-            "market=31&em=19473"
+            "market=31&em=19473",
+            "ICE.BRN"
     ));
     tikers.add(new TikerMeta(
-            "SANDP-500",
-            "market=6&em=90"
-    ));
+            "market=6&em=90",
+            "SANDP-500"
+            ));
   }
 
   private URL createTikerUrl(TikerMeta tikerMeta) {
-    LocalDate dateFrom = LocalDate.of(latestStoredYear, 0, 1);
+    LocalDate dateFrom = latestStoredDate;
     LocalDate dateTo = LocalDate.now();
     String url = String.format("%s?%s&%s&cn=%s&df=%d&mf=%d&yf=%d&dt=%d&mt=%d&yt=%d",
             finamBaseUrl,
             finamDefaultParams,
-            tikerMeta.tiker,
             tikerMeta.url,
-            dateFrom.getDayOfMonth(), dateFrom.getMonthValue(), dateFrom.getYear(),
-            dateTo.getDayOfMonth(), dateTo.getMonthValue(), dateTo.getYear());
+            tikerMeta.tiker,
+            dateFrom.getDayOfMonth(), dateFrom.getMonthValue()-1, dateFrom.getYear(),
+            dateTo.getDayOfMonth(), dateTo.getMonthValue()-1, dateTo.getYear());
     try {
       return new URL(url);
     } catch (Exception e) {

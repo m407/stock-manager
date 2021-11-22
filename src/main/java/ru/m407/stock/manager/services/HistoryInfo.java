@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -16,18 +17,18 @@ public class HistoryInfo {
     this.dataSource = dataSource;
   }
 
-  public int latestStoredYear() {
+  public LocalDate latestStoredDate() {
     try {
       Statement st = dataSource.getConnection().createStatement();
       ResultSet rs = st.executeQuery("select max(ph.date)\n" +
               "from prices_history as ph\n" +
               "where ph.ticker = 'RI.RTSI';");
       if(rs.next()) {
-        return rs.getDate(0).toLocalDate().getYear();
+        return rs.getDate(1).toLocalDate().minusDays(1);
       }
     } catch (Exception e) {
       log.error("Data move to history failed");
     }
-    return 2014;
+    return LocalDate.of(2014, 1,1);
   }
 }

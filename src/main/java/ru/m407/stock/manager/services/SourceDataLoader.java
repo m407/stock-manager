@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 @Service
@@ -29,7 +30,7 @@ public class SourceDataLoader {
       try {
         Statement st = dataSource.getConnection().createStatement();
         st.execute("TRUNCATE TABLE prices_imported;");
-        st.execute("DELETE FROM prices_history WHERE close = 0 AND low = 0 AND open = 0 AND high = 0;");
+        st.execute("DELETE FROM prices_history WHERE (close = 0 AND low = 0 AND open = 0 AND high = 0) OR date = '"+ LocalDate.now().toString() +"';");
       } catch (Exception e) {
         log.error("TRUNCATE failed", e);
       }
